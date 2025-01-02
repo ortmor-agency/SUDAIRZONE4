@@ -1,6 +1,7 @@
 * {
   margin: 0 !important;
   padding: 0 !important;
+  outline: none !important;
   box-sizing: border-box;
   user-select: none !important;
   -webkit-user-select: none;
@@ -12,7 +13,39 @@
   scroll-behavior: smooth;
   -webkit-media-controls: none;
   cursor: pointer;
-  touch-action: none !important;
+  touch-action: manipulation !important;
+}
+
+/* Custom focus style */
+*:focus {
+  outline: 2px solid #ff5722; /* Change to your preferred color */
+  outline-offset: 2px;
+}
+
+/* Disable touch highlight */
+html, body {
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+input,
+textarea,
+select,
+button,
+a {
+  outline: none !important;
+}
+
+:focus {
+  outline: none !important;
+}
+
+a {
+  user-select: none !important;
+}
+
+button {
+  user-select: none !important;
 }
 
 .swal-vertical-container {

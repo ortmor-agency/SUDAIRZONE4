@@ -12,6 +12,7 @@ function App() {
   const [isIdle, setIsIdle] = useState(false);
   const navigate = useNavigate();
   const timeout = 60000;
+ 
 
   const handleOnActive = () => setIsIdle(false);
   const handleOnIdle = () => setIsIdle(true);
