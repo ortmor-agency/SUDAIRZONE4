@@ -12,7 +12,6 @@ function App() {
   const [isIdle, setIsIdle] = useState(false);
   const navigate = useNavigate();
   const timeout = 60000;
- 
 
   const handleOnActive = () => setIsIdle(false);
   const handleOnIdle = () => setIsIdle(true);
@@ -37,16 +36,16 @@ function App() {
       confirmButtonText: "Yes",
       cancelButtonText: "No",
       customClass: {
-        container: "swal-vertical-container", 
+        container: "swal-vertical-container",
         popup: "swal-vertical-popup",
-        confirmButton: "swal-confirm-button", 
-        cancelButton: "swal-cancel-button", 
+        confirmButton: "swal-confirm-button",
+        cancelButton: "swal-cancel-button",
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        enterFullScreen(); 
+        enterFullScreen();
       } else {
-        exitFullScreen(); 
+        exitFullScreen();
       }
     });
   }, [enterFullScreen, exitFullScreen]);
