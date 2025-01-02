@@ -1,6 +1,6 @@
 * {
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
   box-sizing: border-box;
   user-select: none !important;
   -webkit-user-select: none;
@@ -12,7 +12,66 @@
   scroll-behavior: smooth;
   -webkit-media-controls: none;
   cursor: pointer;
-  touch-action:none !important;
+  touch-action: none !important;
+}
+
+.swal-vertical-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.swal-vertical-popup {
+  width: 100%;
+  max-width: 400px;
+  height: 150px;
+  background-color: #635f53 !important;
+  color: #fff !important;
+  margin: 0 auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+div:where(.swal2-container) h2:where(.swal2-title) {
+  position: relative;
+  max-width: 100%;
+  margin: 0;
+  padding: 0.8em 1em 0;
+  margin-top: 1em !important;
+  color: inherit;
+  font-size: 1.875em;
+  font-weight: 600;
+  text-align: center;
+  text-transform: none;
+  word-wrap: break-word;
+  cursor: initial;
+}
+
+div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm) {
+  border: 0;
+  width: 80px;
+  height: 50px;
+  border-radius: 0.25em;
+  background: initial;
+  background-color: #7066e0;
+  color: #fff;
+  margin-left: 0.5em !important;
+  margin-right: 0.5em !important;
+  font-size: 1em;
+}
+
+div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel) {
+  border: 0;
+  width: 80px;
+  height: 50px;
+  border-radius: 0.25em;
+  background: initial;
+  background-color: #ea3737;
+  color: #fff;
+  font-size: 1em;
+  margin-left: 1em !important;
+  margin-right: 1em !important;
 }
 
 a {
@@ -36,6 +95,8 @@ body {
 
 html {
   scrollbar-width: none;
+  margin: 0;
+  padding: 0;
   scroll-behavior: smooth;
   scrollbar-color: #beb7a4 transparent;
 }

@@ -11,7 +11,7 @@ function App() {
   const { isFullScreen, enterFullScreen, exitFullScreen } = useFullScreen();
   const [isIdle, setIsIdle] = useState(false);
   const navigate = useNavigate();
-  const timeout = 5000;
+  const timeout = 60000;
 
   const handleOnActive = () => setIsIdle(false);
   const handleOnIdle = () => setIsIdle(true);
@@ -24,25 +24,28 @@ function App() {
 
   useEffect(() => {
     if (isIdle) {
-      navigate("/en");
+      navigate("/");
     }
   }, [isIdle, navigate]);
 
-  // Show SweetAlert2 modal on initial load
   useEffect(() => {
     Swal.fire({
-      title: "Do you want to enable full-screen mode?",
-      text: "You can exit full-screen mode at any time.",
-      icon: "question",
+      title: "fullscreen mode?",
+      width: "50%",
       showCancelButton: true,
-      confirmButtonText: "Yes, enable",
-      cancelButtonText: "No, thanks",
+      confirmButtonText: "Yes",
+      cancelButtonText: "No",
+      customClass: {
+        container: "swal-vertical-container", 
+        popup: "swal-vertical-popup",
+        confirmButton: "swal-confirm-button", 
+        cancelButton: "swal-cancel-button", 
+      },
     }).then((result) => {
       if (result.isConfirmed) {
-        enterFullScreen(); // Enable full-screen mode
-        Swal.fire("Full-Screen Enabled!", "You can exit it anytime.", "success");
+        enterFullScreen(); 
       } else {
-        exitFullScreen(); // Ensure full-screen mode is off
+        exitFullScreen(); 
       }
     });
   }, [enterFullScreen, exitFullScreen]);
