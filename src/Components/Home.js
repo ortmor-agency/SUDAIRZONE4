@@ -1,14 +1,22 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import idleVideo from "../Media/Videos/home.mp4";
 import Engbtn from "../Media/Buttons/lan_eng.png";
 import Arbtn from "../Media/Buttons/lan_ara.png";
-
-import { Link } from "react-router-dom";
 import "../Styles/home.scss";
 
 function Home() {
   const APIKEY = process.env.REACT_APP_IPKEY;
+  const navigate = useNavigate();
+
+  const handleOnEnglishNav = () => {
+    navigate("/en");
+  };
+
+  const handleOnArabicNav = () => {
+    navigate("/ar");
+  };
 
   useEffect(() => {
     const changeidle = async (e) => {
@@ -33,8 +41,8 @@ function Home() {
       </div>
 
       <div className="langbtnroundmain">
-        <button></button>
-        <button></button>
+        <button onClick={handleOnEnglishNav}></button>
+        <button onClick={handleOnArabicNav}></button>
       </div>
 
       <video

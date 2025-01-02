@@ -125,13 +125,47 @@
 
 // export default SelectionEn;
 
+// import React, { useState, useEffect } from "react";
+// import axios from "axios";
+// import IMG1 from "../Media/Buttons/English/GSPRE_Eng_i.png";
+// import IMG1A from "../Media/Buttons/English/GSPRE_Eng_s.png";
+// import IMG2 from "../Media/Buttons/English/NREP_eng_i.png";
+// import IMG2A from "../Media/Buttons/English/NREP_eng_s.png";
+// import IMG3 from "../Media/Buttons/English/NGHC_eng_i.png";
+// import IMG3A from "../Media/Buttons/English/NGHC_eng_s.png";
+// import IMG4 from "../Media/Buttons/English/NEOM_eng_i.png";
+// import IMG4A from "../Media/Buttons/English/NEOM_eng_s.png";
+// import IMG5 from "";
+// import IMG5A from "";
+// import IMG6 from "";
+// import IMG6A from "";
+// import IMG7 from "";
+// import IMG7A from "";
+// import IMG8 from "";
+// import IMG8A from "";
+// import IMG9 from "";
+// import IMG9A from "";
+// import IMG10 from "";
+// import IMG10A from "";
+// import IMG11 from "";
+import selectionVideo from "../Media/Videos/selection.mp4";
+import "../Styles/selection.scss";
 
-import React from 'react'
-
-const SelectionEn = () => {
+function SelectionEn() {
   return (
-    <div>SelectionEn</div>
-  )
+    <div className="selectioncontainer">
+      <video
+        id="Video"
+        controls={false}
+        width="100%"
+        src={selectionVideo}
+        autoPlay={true}
+        loop={true}
+        muted={true}
+        playsInline={true}
+      />
+    </div>
+  );
 }
 
-export default SelectionEn
+export default SelectionEn;

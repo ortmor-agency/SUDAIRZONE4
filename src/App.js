@@ -1,5 +1,4 @@
 import React, { Fragment, useEffect, useState } from "react";
-import Swal from "sweetalert2";
 import { Route, Routes } from "react-router-dom";
 import Home from "./Components/Home";
 import SelectionEn from "./Components/SelectionEn";
@@ -26,19 +25,18 @@ function App() {
       }
     }, 1000);
 
-    return () => clearInterval(interval); // Cleanup the interval
+    return () => clearInterval(interval); 
   }, [isIdle]);
-  
-    return (
-      <Fragment>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/en" element={<SelectionEn />} />
-          <Route path="/ar" element={<SelectionAr />} />
-        </Routes>
-      </Fragment>
-    );
-  }
 
+  return (
+    <Fragment>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/en" element={<SelectionEn />} />
+        <Route path="/ar" element={<SelectionAr />} />
+      </Routes>
+    </Fragment>
+  );
+}
 
 export default App;
