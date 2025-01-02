@@ -1,12 +1,17 @@
+// index.js
 import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import "./index.css";
+import ReactDOM from "react-dom";
 import App from "./App";
+import { BrowserRouter as Router } from "react-router-dom";
+import { FullScreenProvider } from "./FullScreenContext";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
+ReactDOM.render(
+  <React.StrictMode>
+    <Router>
+      <FullScreenProvider>
+        <App />
+      </FullScreenProvider>
+    </Router>
+  </React.StrictMode>,
+  document.getElementById("root")
 );
