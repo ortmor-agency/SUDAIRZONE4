@@ -30,6 +30,19 @@
   }
 }
 
+.selectionheadar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 4em;
+  width: 100%;
+
+  img {
+    width: 400px;
+  }
+}
+
 .selectionfooterbtn {
   display: flex;
   justify-content: center;

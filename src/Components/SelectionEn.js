@@ -51,8 +51,105 @@ function SelectionEn() {
     }
   };
 
+  const Selectiontwo = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/3/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-  
+  const Selectionthree = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/4/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionfour = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/5/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionfive = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/6/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionsix = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/7/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionseven = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/8/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectioneight = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/9/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionnine = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/10/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionten = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/11/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectioneleven = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/12/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="selectioncontainer">
@@ -64,50 +161,87 @@ function SelectionEn() {
         <div className="selectionbuttonmaincontainer">
           <div className="selectionchildsection">
             <button onClick={() => handleButtonClick(1)}>
-              <img src={selectedButton === 1 ? IMG1A : IMG1} alt="Button 1" />
+              <img
+                onClick={Selectionone}
+                src={selectedButton === 1 ? IMG1A : IMG1}
+                alt="Button 1"
+              />
             </button>
             <button onClick={() => handleButtonClick(2)}>
-              <img src={selectedButton === 2 ? IMG2A : IMG2} alt="Button 2" />
+              <img
+                onClick={Selectiontwo}
+                src={selectedButton === 2 ? IMG2A : IMG2}
+                alt="Button 2"
+              />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
             <button onClick={() => handleButtonClick(3)}>
-              <img src={selectedButton === 3 ? IMG3A : IMG3} alt="Button 3" />
+              <img
+                onClick={Selectionthree}
+                src={selectedButton === 3 ? IMG3A : IMG3}
+                alt="Button 3"
+              />
             </button>
             <button onClick={() => handleButtonClick(4)}>
-              <img src={selectedButton === 4 ? IMG4A : IMG4} alt="Button 4" />
+              <img
+                onClick={Selectionfour}
+                src={selectedButton === 4 ? IMG4A : IMG4}
+                alt="Button 4"
+              />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
             <button onClick={() => handleButtonClick(5)}>
-              <img src={selectedButton === 5 ? IMG5A : IMG5} alt="Button 5" />
+              <img
+                onClick={Selectionfive}
+                src={selectedButton === 5 ? IMG5A : IMG5}
+                alt="Button 5"
+              />
             </button>
             <button onClick={() => handleButtonClick(6)}>
-              <img src={selectedButton === 6 ? IMG6A : IMG6} alt="Button 6" />
+              <img
+                onClick={Selectionsix}
+                src={selectedButton === 6 ? IMG6A : IMG6}
+                alt="Button 6"
+              />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
             <button onClick={() => handleButtonClick(7)}>
-              <img src={selectedButton === 7 ? IMG7A : IMG7} alt="Button 7" />
+              <img
+                onClick={Selectionseven}
+                src={selectedButton === 7 ? IMG7A : IMG7}
+                alt="Button 7"
+              />
             </button>
             <button onClick={() => handleButtonClick(8)}>
-              <img src={selectedButton === 8 ? IMG8A : IMG8} alt="Button 8" />
+              <img
+                onClick={Selectioneight}
+                src={selectedButton === 8 ? IMG8A : IMG8}
+                alt="Button 8"
+              />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
             <button onClick={() => handleButtonClick(9)}>
-              <img src={selectedButton === 9 ? IMG9A : IMG9} alt="Button 9" />
+              <img
+                onClick={Selectionnine}
+                src={selectedButton === 9 ? IMG9A : IMG9}
+                alt="Button 9"
+              />
             </button>
             <button onClick={() => handleButtonClick(10)}>
               <img
+                onClick={Selectionten}
                 src={selectedButton === 10 ? IMG10A : IMG10}
                 alt="Button 10"
               />
@@ -118,6 +252,7 @@ function SelectionEn() {
           <div className="selectionmainchildbtn">
             <button onClick={() => handleButtonClick(11)}>
               <img
+                onClick={Selectioneleven}
                 src={selectedButton === 11 ? IMG11A : IMG11}
                 alt="Button 11"
               />
