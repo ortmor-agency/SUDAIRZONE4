@@ -1,0 +1,67 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none !important;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  scroll-behavior: smooth;
+  -webkit-tab-highlight-color: transparent;
+  scroll-behavior: smooth;
+  -webkit-media-controls: none;
+  cursor: pointer;
+  touch-action:none !important;
+}
+
+a {
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  background: #beb7a4;
+  user-select: none !important;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+
+html {
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  scrollbar-color: #beb7a4 transparent;
+}
+
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+html:hover {
+  scrollbar-color: #beb7a4 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+::root {
+  scrollbar-width: 0px;
+  scrollbar-width: none;
+}
+.app {
+  user-select: none !important;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-tab-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
