@@ -5,8 +5,9 @@ import screenfull from "screenfull";
 const FullScreenContext = createContext();
 
 export const FullScreenProvider = ({ children }) => {
+ // eslint-disable-next-line no-warning-comments
   const [isFullScreen, setIsFullScreen] = useState(false);
-
+// eslint-disable-next-line no-warning-comments
   const toggleFullScreen = useCallback(() => {
     if (screenfull.isEnabled) {
       screenfull.toggle();
