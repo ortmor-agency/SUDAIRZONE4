@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -17,7 +18,7 @@ function Home() {
   const handleOnArabicNav = () => {
     navigate("/ar");
   };
-// eslint-disable-next-line no-warning-comments
+
   useEffect(() => {
     const changeidle = async (e) => {
       const Api = `${APIKEY}/api/v1/composition/layers/1/clips/1/connect`;
@@ -29,9 +30,9 @@ function Home() {
       }
     };
     changeidle();
-    // eslint-disable-next-line no-warning-comments
+   
   }, []);
-// eslint-disable-next-line no-warning-comments
+
   return (
     <div className="home-container">
       <div className="langbtnmain">

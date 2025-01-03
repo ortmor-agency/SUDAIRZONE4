@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { Fragment, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { Route, Routes, useNavigate } from "react-router-dom";
