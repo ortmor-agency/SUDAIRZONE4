@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import IMG1 from "../Media/Buttons/English/GSPRE_Eng_i.png";
@@ -32,155 +32,111 @@ function SelectionEn() {
   const navigate = useNavigate();
   const APIKEY = process.env.REACT_APP_IPKEY;
   const [selectedButton, setSelectedButton] = useState(null);
+  const isTransitioning = useRef(false);
+  const pendingTransition = useRef(null);
 
-  const handleButtonClick = (buttonId) => {
-    setSelectedButton(buttonId);
+  const makeApiCall = async (endpoint) => {
+    const Api = `${APIKEY}${endpoint}`;
+    try {
+      const response = await axios.post(Api);
+      console.log(response);
+      // Add a small delay for video transition
+      await new Promise((resolve) => setTimeout(resolve, 3300));
+      return response;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   };
+
+  const selectionFunctions = {
+    1: () => makeApiCall("/api/v1/composition/layers/3/clips/1/connect"),
+    2: () => makeApiCall("/api/v1/composition/layers/3/clips/2/connect"),
+    3: () => makeApiCall("/api/v1/composition/layers/3/clips/3/connect"),
+    4: () => makeApiCall("/api/v1/composition/layers/3/clips/4/connect"),
+    5: () => makeApiCall("/api/v1/composition/layers/3/clips/5/connect"),
+    6: () => makeApiCall("/api/v1/composition/layers/3/clips/6/connect"),
+    7: () => makeApiCall("/api/v1/composition/layers/3/clips/7/connect"),
+    8: () => makeApiCall("/api/v1/composition/layers/3/clips/8/connect"),
+    9: () => makeApiCall("/api/v1/composition/layers/3/clips/9/connect"),
+    10: () => makeApiCall("/api/v1/composition/layers/3/clips/10/connect"),
+    11: () => makeApiCall("/api/v1/composition/layers/3/clips/11/connect"),
+  };
+
+  const outFunctions = {
+    1: () => makeApiCall("/api/v1/composition/layers/2/clips/1/connect"),
+    2: () => makeApiCall("/api/v1/composition/layers/2/clips/2/connect"),
+    3: () => makeApiCall("/api/v1/composition/layers/2/clips/3/connect"),
+    4: () => makeApiCall("/api/v1/composition/layers/2/clips/4/connect"),
+    5: () => makeApiCall("/api/v1/composition/layers/2/clips/5/connect"),
+    6: () => makeApiCall("/api/v1/composition/layers/2/clips/6/connect"),
+    7: () => makeApiCall("/api/v1/composition/layers/2/clips/7/connect"),
+    8: () => makeApiCall("/api/v1/composition/layers/2/clips/8/connect"),
+    9: () => makeApiCall("/api/v1/composition/layers/2/clips/9/connect"),
+    10: () => makeApiCall("/api/v1/composition/layers/2/clips/10/connect"),
+    11: () => makeApiCall("/api/v1/composition/layers/2/clips/11/connect"),
+  };
+
+  const processVideoTransition = async (newButtonId) => {
+    if (isTransitioning.current) {
+      pendingTransition.current = newButtonId;
+      return;
+    }
+
+    isTransitioning.current = true;
+
+    try {
+      // Play out animation for current selection if exists
+      if (selectedButton && outFunctions[selectedButton]) {
+        await outFunctions[selectedButton]();
+      }
+
+      // Play in animation for new selection
+      if (selectionFunctions[newButtonId]) {
+        await selectionFunctions[newButtonId]();
+      }
+    } catch (error) {
+      console.error("Error during video transition:", error);
+    } finally {
+      isTransitioning.current = false;
+
+      // Handle any pending transitions
+      if (pendingTransition.current !== null) {
+        const nextTransition = pendingTransition.current;
+        pendingTransition.current = null;
+        processVideoTransition(nextTransition);
+      }
+    }
+  };
+
+  const handleButtonClick = (newButtonId) => {
+    // Update UI immediately
+    setSelectedButton(newButtonId);
+
+    // Handle video transition in the background
+    processVideoTransition(newButtonId);
+  };
+
+  // Initial setup effect
+  useEffect(() => {
+    const initializeVideos = async () => {
+      try {
+        await makeApiCall("/api/v1/composition/layers/1/clips/2/connect");
+
+        setTimeout(async () => {
+          await makeApiCall("/api/v1/composition/layers/1/clips/3/connect");
+        }, 5000);
+      } catch (error) {
+        console.error("Error during initialization:", error);
+      }
+    };
+
+    initializeVideos();
+  }, []);
 
   const handleOnHomeNav = () => {
     navigate("/");
   };
-
-  useEffect(() => {
-
-
-    setTimeout(() => {
-      const changeoutidle = async (e) => {
-        const Api = `${APIKEY}/api/v1/composition/layers/1/clips/3/connect`;
-        try {
-          let response = await axios.post(Api);
-          console.log(response);
-        } catch (err) {
-          console.log(err);
-        }
-      };
-      changeoutidle();
-    }, 5000);
-
-
-    const changeidle = async (e) => {
-      const Api = `${APIKEY}/api/v1/composition/layers/1/clips/2/connect`;
-      try {
-        let response = await axios.post(Api);
-        console.log(response);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    changeidle();
-   
-  }, []);
-
-  const Selectionone = async () => {
-    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/2/connect`;
-    try {
-      let response = await axios.post(Api);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const Selectiontwo = async () => {
-    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/3/connect`;
-    try {
-      let response = await axios.post(Api);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const Selectionthree = async () => {
-    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/4/connect`;
-    try {
-      let response = await axios.post(Api);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const Selectionfour = async () => {
-    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/5/connect`;
-    try {
-      let response = await axios.post(Api);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const Selectionfive = async () => {
-    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/6/connect`;
-    try {
-      let response = await axios.post(Api);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const Selectionsix = async () => {
-    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/7/connect`;
-    try {
-      let response = await axios.post(Api);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const Selectionseven = async () => {
-    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/8/connect`;
-    try {
-      let response = await axios.post(Api);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const Selectioneight = async () => {
-    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/9/connect`;
-    try {
-      let response = await axios.post(Api);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const Selectionnine = async () => {
-    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/10/connect`;
-    try {
-      let response = await axios.post(Api);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const Selectionten = async () => {
-    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/11/connect`;
-    try {
-      let response = await axios.post(Api);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const Selectioneleven = async () => {
-    const Api = `${APIKEY}/api/v1/composition/layers/1/clips/12/connect`;
-    try {
-      let response = await axios.post(Api);
-      console.log(response);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   return (
     <div className="selectioncontainer">
       <div className="selectionhead">
@@ -191,87 +147,50 @@ function SelectionEn() {
         <div className="selectionbuttonmaincontainer">
           <div className="selectionchildsection">
             <button onClick={() => handleButtonClick(1)}>
-              <img
-                onClick={Selectionone}
-                src={selectedButton === 1 ? IMG1A : IMG1}
-                alt="Button 1"
-              />
+              <img src={selectedButton === 1 ? IMG1A : IMG1} alt="Button 1" />
             </button>
             <button onClick={() => handleButtonClick(2)}>
-              <img
-                onClick={Selectiontwo}
-                src={selectedButton === 2 ? IMG2A : IMG2}
-                alt="Button 2"
-              />
+              <img src={selectedButton === 2 ? IMG2A : IMG2} alt="Button 2" />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
             <button onClick={() => handleButtonClick(3)}>
-              <img
-                onClick={Selectionthree}
-                src={selectedButton === 3 ? IMG3A : IMG3}
-                alt="Button 3"
-              />
+              <img src={selectedButton === 3 ? IMG3A : IMG3} alt="Button 3" />
             </button>
             <button onClick={() => handleButtonClick(4)}>
-              <img
-                onClick={Selectionfour}
-                src={selectedButton === 4 ? IMG4A : IMG4}
-                alt="Button 4"
-              />
+              <img src={selectedButton === 4 ? IMG4A : IMG4} alt="Button 4" />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
             <button onClick={() => handleButtonClick(5)}>
-              <img
-                onClick={Selectionfive}
-                src={selectedButton === 5 ? IMG5A : IMG5}
-                alt="Button 5"
-              />
+              <img src={selectedButton === 5 ? IMG5A : IMG5} alt="Button 5" />
             </button>
             <button onClick={() => handleButtonClick(6)}>
-              <img
-                onClick={Selectionsix}
-                src={selectedButton === 6 ? IMG6A : IMG6}
-                alt="Button 6"
-              />
+              <img src={selectedButton === 6 ? IMG6A : IMG6} alt="Button 6" />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
             <button onClick={() => handleButtonClick(7)}>
-              <img
-                onClick={Selectionseven}
-                src={selectedButton === 7 ? IMG7A : IMG7}
-                alt="Button 7"
-              />
+              <img src={selectedButton === 7 ? IMG7A : IMG7} alt="Button 7" />
             </button>
             <button onClick={() => handleButtonClick(8)}>
-              <img
-                onClick={Selectioneight}
-                src={selectedButton === 8 ? IMG8A : IMG8}
-                alt="Button 8"
-              />
+              <img src={selectedButton === 8 ? IMG8A : IMG8} alt="Button 8" />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
             <button onClick={() => handleButtonClick(9)}>
-              <img
-                onClick={Selectionnine}
-                src={selectedButton === 9 ? IMG9A : IMG9}
-                alt="Button 9"
-              />
+              <img src={selectedButton === 9 ? IMG9A : IMG9} alt="Button 9" />
             </button>
             <button onClick={() => handleButtonClick(10)}>
               <img
-                onClick={Selectionten}
                 src={selectedButton === 10 ? IMG10A : IMG10}
                 alt="Button 10"
               />
@@ -282,7 +201,6 @@ function SelectionEn() {
           <div className="selectionmainchildbtn">
             <button onClick={() => handleButtonClick(11)}>
               <img
-                onClick={Selectioneleven}
                 src={selectedButton === 11 ? IMG11A : IMG11}
                 alt="Button 11"
               />
@@ -296,6 +214,7 @@ function SelectionEn() {
           <img src={Homebtn} alt="Home" />
         </button>
       </div>
+
       <video
         id="Video"
         controls={false}
