@@ -20,8 +20,21 @@ function Home() {
   };
 
   useEffect(() => {
+    setTimeout(() => {
+      const changeoutidle = async (e) => {
+        const Api = `${APIKEY}/api/v1/composition/layers/1/clips/1/connect`;
+        try {
+          let response = await axios.post(Api);
+          console.log(response);
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      changeoutidle();
+    }, 4000);
+
     const changeidle = async (e) => {
-      const Api = `${APIKEY}/api/v1/composition/layers/1/clips/1/connect`;
+      const Api = `${APIKEY}/api/v1/composition/layers/1/clips/4/connect`;
       try {
         let response = await axios.post(Api);
         console.log(response);
@@ -30,7 +43,6 @@ function Home() {
       }
     };
     changeidle();
-   
   }, []);
 
   return (

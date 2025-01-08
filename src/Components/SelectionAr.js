@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import IMG1 from "../Media/Buttons/Arabic/GSPRE_ara_i.png";
@@ -40,6 +40,32 @@ function SelectionAr() {
   const handleOnHomeNav = () => {
     navigate("/");
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      const changeoutidle = async (e) => {
+        const Api = `${APIKEY}/api/v1/composition/layers/1/clips/3/connect`;
+        try {
+          let response = await axios.post(Api);
+          console.log(response);
+        } catch (err) {
+          console.log(err);
+        }
+      };
+      changeoutidle();
+    }, 5000);
+
+    const changeidle = async (e) => {
+      const Api = `${APIKEY}/api/v1/composition/layers/1/clips/2/connect`;
+      try {
+        let response = await axios.post(Api);
+        console.log(response);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    changeidle();
+  }, []);
 
   const Selectionone = async () => {
     const Api = `${APIKEY}/api/v1/composition/layers/2/clips/2/connect`;

@@ -12,7 +12,7 @@ function App() {
   const { isFullScreen, enterFullScreen, exitFullScreen } = useFullScreen();
   const [isIdle, setIsIdle] = useState(false);
   const navigate = useNavigate();
-  const timeout = 60000;
+  const timeout = 120000;
 
   const handleOnActive = () => setIsIdle(false);
   const handleOnIdle = () => setIsIdle(true);
