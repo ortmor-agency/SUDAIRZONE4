@@ -42,7 +42,18 @@
     margin: auto;
     position: absolute;
     width: 100%;
+    animation: buttonReveal 5s ease-in-out;
     height: 31vh;
+    @keyframes buttonReveal {
+      from {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
 
     button {
       margin-left: 10em !important;

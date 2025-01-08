@@ -117,12 +117,12 @@
       img {
         width: 100%;
         object-fit: cover;
-        animation: buttonReveal 0.5s ease-in-out;
+        animation: buttonReveal 7s ease-in-out;
       }
       @keyframes buttonReveal {
         from {
           transform: scale(0.9);
-          opacity: 0.1;
+          opacity: 0;
         }
         to {
           transform: scale(1);
@@ -145,13 +145,13 @@
       z-index: 9;
 
       img {
-        animation: buttonReveal 0.5s ease-in-out;
+        animation: buttonReveal 7s ease-in-out;
       }
 
       @keyframes buttonReveal {
         from {
           transform: scale(0.9);
-          opacity: 0.1;
+          opacity: 0;
         }
         to {
           transform: scale(1);

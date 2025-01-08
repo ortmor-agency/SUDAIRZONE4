@@ -1,50 +1,65 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import IMG1 from "../Media/Buttons/English/GSPRE_Eng_i.png";
-import IMG1A from "../Media/Buttons/English/GSPRE_Eng_s.png";
-import IMG2 from "../Media/Buttons/English/NREP_eng_i.png";
-import IMG2A from "../Media/Buttons/English/NREP_eng_s.png";
-import IMG3 from "../Media/Buttons/English/NGHC_eng_i.png";
-import IMG3A from "../Media/Buttons/English/NGHC_eng_s.png";
-import IMG4 from "../Media/Buttons/English/NEOM_eng_i.png";
-import IMG4A from "../Media/Buttons/English/NEOM_eng_s.png";
-import IMG5 from "../Media/Buttons/English/SGI_eng_i.png";
-import IMG5A from "../Media/Buttons/English/SGI_eng_s.png";
-import IMG6 from "../Media/Buttons/English/KSP_eng_i.png";
-import IMG6A from "../Media/Buttons/English/KSP_eng_s.png";
-import IMG7 from "../Media/Buttons/English/Tarshid_eng_i.png";
-import IMG7A from "../Media/Buttons/English/Tarshid_eng_s.png";
-import IMG8 from "../Media/Buttons/English/SEEC_eng_i.png";
-import IMG8A from "../Media/Buttons/English/SEEC_eng_s.png";
-import IMG9 from "../Media/Buttons/English/Alat_eng_i.png";
-import IMG9A from "../Media/Buttons/English/Alat_eng_s.png";
-import IMG10 from "../Media/Buttons/English/Ceer_eng_i.png";
-import IMG10A from "../Media/Buttons/English/Ceer_eng_s.png";
-import IMG11 from "../Media/Buttons/English/AMI_eng_i.png";
-import IMG11A from "../Media/Buttons/English/AMI_eng_s.png";
+import IMG1 from "../Media/Buttons/Arabic/GSPRE_ara_i.png";
+import IMG1A from "../Media/Buttons/Arabic/GSPRE_ara_s.png";
+import IMG2 from "../Media/Buttons/Arabic/NREP_ara_i.png";
+import IMG2A from "../Media/Buttons/Arabic/NREP_ara_s.png";
+import IMG3 from "../Media/Buttons/Arabic/NGHC_ara_i.png";
+import IMG3A from "../Media/Buttons/Arabic/NGHC_ara_s.png";
+import IMG4 from "../Media/Buttons/Arabic/NEOM_ara_i.png";
+import IMG4A from "../Media/Buttons/Arabic/NEOM_ara_s.png";
+import IMG5 from "../Media/Buttons/Arabic/SGI_ara_i.png";
+import IMG5A from "../Media/Buttons/Arabic/SGI_ara_s.png";
+import IMG6 from "../Media/Buttons/Arabic/KSP_ara_i.png";
+import IMG6A from "../Media/Buttons/Arabic/KSP_ara_s.png";
+import IMG7 from "../Media/Buttons/Arabic/Tarshid_ara_i.png";
+import IMG7A from "../Media/Buttons/Arabic/Tarshid_ara_s.png";
+import IMG8 from "../Media/Buttons/Arabic/SEEC_ara_i.png";
+import IMG8A from "../Media/Buttons/Arabic/SEEC_ara_s.png";
+import IMG9 from "../Media/Buttons/Arabic/Alat_ara_i.png";
+import IMG9A from "../Media/Buttons/Arabic/Alat_ara_s.png";
+import IMG10 from "../Media/Buttons/Arabic/Ceer_ara_i.png";
+import IMG10A from "../Media/Buttons/Arabic/Ceer_ara_s.png";
+import IMG11 from "../Media/Buttons/Arabic/AMI_ara_i.png";
+import IMG11A from "../Media/Buttons/Arabic/AMI_ara_s.png";
 import Homebtn from "../Media/Buttons/ico_home.png";
-import Headbtn from "../Media/Buttons/head.png";
+import Headbtn from "../Media/Buttons/headar.png";
 import selectionVideo from "../Media/Videos/selection.mp4";
 import "../Styles/selection.scss";
 
 function SelectionAr() {
   const navigate = useNavigate();
+  const [disable, setDisable] = useState(true);
   const APIKEY = process.env.REACT_APP_IPKEY;
   const [selectedButton, setSelectedButton] = useState(null);
   const isTransitioning = useRef(false);
   const pendingTransition = useRef(null);
+  const transitionTimeout = useRef(null);
+  const abortControllerRef = useRef(null);
 
   const makeApiCall = async (endpoint) => {
+    // Cancel any ongoing API calls
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Create new abort controller for this call
+    abortControllerRef.current = new AbortController();
+
     const Api = `${APIKEY}${endpoint}`;
     try {
-      const response = await axios.post(Api);
-      console.log(response);
-      // Add a small delay for video transition
-      await new Promise((resolve) => setTimeout(resolve, 3300));
+      const response = await axios.post(Api, null, {
+        signal: abortControllerRef.current.signal,
+        timeout: 5000, // 5 second timeout
+      });
       return response;
     } catch (err) {
-      console.log(err);
+      if (axios.isCancel(err)) {
+        console.log("Request cancelled:", endpoint);
+      } else {
+        console.error(`API call failed for endpoint ${endpoint}:`, err);
+      }
       throw err;
     }
   };
@@ -77,7 +92,20 @@ function SelectionAr() {
     11: () => makeApiCall("/api/v1/composition/layers/4/clips/11/connect"),
   };
 
+  const cleanupTransition = () => {
+    isTransitioning.current = false;
+    if (transitionTimeout.current) {
+      clearTimeout(transitionTimeout.current);
+      transitionTimeout.current = null;
+    }
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  };
+
   const processVideoTransition = async (newButtonId) => {
+    // If already transitioning, queue the new transition
     if (isTransitioning.current) {
       pendingTransition.current = newButtonId;
       return;
@@ -86,57 +114,98 @@ function SelectionAr() {
     isTransitioning.current = true;
 
     try {
+      // Set a timeout to clear the transitioning state in case something goes wrong
+      transitionTimeout.current = setTimeout(() => {
+        cleanupTransition();
+      }, 5000); // 5 second safety timeout
+
       // Play out animation for current selection if exists
-      if (selectedButton && outFunctions[selectedButton]) {
+      if (outFunctions[selectedButton]) {
         await outFunctions[selectedButton]();
+        // Add a small delay between out and in transitions
+        await new Promise((resolve) => setTimeout(resolve, 300));
       }
 
       // Play in animation for new selection
       if (selectionFunctions[newButtonId]) {
         await selectionFunctions[newButtonId]();
+        // Wait for the transition to complete
+        await new Promise((resolve) => setTimeout(resolve, 300));
       }
     } catch (error) {
-      console.error("Error during video transition:", error);
+      if (!axios.isCancel(error)) {
+        console.error("Error during video transition:", error);
+      }
     } finally {
-      isTransitioning.current = false;
+      cleanupTransition();
 
       // Handle any pending transitions
       if (pendingTransition.current !== null) {
         const nextTransition = pendingTransition.current;
         pendingTransition.current = null;
-        processVideoTransition(nextTransition);
+        // Small delay before processing next transition
+        setTimeout(() => {
+          processVideoTransition(nextTransition);
+        }, 300);
       }
     }
   };
 
   const handleButtonClick = (newButtonId) => {
+    // Prevent rapid clicking
+    if (isTransitioning.current) {
+      return;
+    }
+
+    // Don't process if clicking the same button
+    if (selectedButton === newButtonId) {
+      return;
+    }
+
     // Update UI immediately
     setSelectedButton(newButtonId);
 
-    // Handle video transition in the background
+    // Handle video transition
     processVideoTransition(newButtonId);
   };
 
-  // Initial setup effect
   useEffect(() => {
+    let mounted = true;
+
     const initializeVideos = async () => {
       try {
+        setDisable(true);
         await makeApiCall("/api/v1/composition/layers/1/clips/2/connect");
 
-        setTimeout(async () => {
+        if (mounted) {
+          // Add delay for initial transition
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
           await makeApiCall("/api/v1/composition/layers/1/clips/3/connect");
-        }, 5000);
+          setDisable(false);
+        }
       } catch (error) {
-        console.error("Error during initialization:", error);
+        if (mounted && !axios.isCancel(error)) {
+          console.error("Error during initialization:", error);
+          // Enable buttons even if initialization fails
+          setDisable(false);
+        }
       }
     };
 
     initializeVideos();
+
+    // Cleanup function
+    return () => {
+      mounted = false;
+      cleanupTransition();
+    };
   }, []);
 
   const handleOnHomeNav = () => {
     navigate("/");
   };
+
   return (
     <div className="selectioncontainer">
       <div className="selectionhead">
@@ -146,50 +215,50 @@ function SelectionAr() {
       <div className="selectionbuttonmaincontainermask">
         <div className="selectionbuttonmaincontainer">
           <div className="selectionchildsection">
-            <button onClick={() => handleButtonClick(1)}>
+            <button disabled={disable} onClick={() => handleButtonClick(1)}>
               <img src={selectedButton === 1 ? IMG1A : IMG1} alt="Button 1" />
             </button>
-            <button onClick={() => handleButtonClick(2)}>
+            <button disabled={disable} onClick={() => handleButtonClick(2)}>
               <img src={selectedButton === 2 ? IMG2A : IMG2} alt="Button 2" />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
-            <button onClick={() => handleButtonClick(3)}>
+            <button disabled={disable} onClick={() => handleButtonClick(3)}>
               <img src={selectedButton === 3 ? IMG3A : IMG3} alt="Button 3" />
             </button>
-            <button onClick={() => handleButtonClick(4)}>
+            <button disabled={disable} onClick={() => handleButtonClick(4)}>
               <img src={selectedButton === 4 ? IMG4A : IMG4} alt="Button 4" />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
-            <button onClick={() => handleButtonClick(5)}>
+            <button disabled={disable} onClick={() => handleButtonClick(5)}>
               <img src={selectedButton === 5 ? IMG5A : IMG5} alt="Button 5" />
             </button>
-            <button onClick={() => handleButtonClick(6)}>
+            <button disabled={disable} onClick={() => handleButtonClick(6)}>
               <img src={selectedButton === 6 ? IMG6A : IMG6} alt="Button 6" />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
-            <button onClick={() => handleButtonClick(7)}>
+            <button disabled={disable} onClick={() => handleButtonClick(7)}>
               <img src={selectedButton === 7 ? IMG7A : IMG7} alt="Button 7" />
             </button>
-            <button onClick={() => handleButtonClick(8)}>
+            <button disabled={disable} onClick={() => handleButtonClick(8)}>
               <img src={selectedButton === 8 ? IMG8A : IMG8} alt="Button 8" />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
-            <button onClick={() => handleButtonClick(9)}>
+            <button disabled={disable} onClick={() => handleButtonClick(9)}>
               <img src={selectedButton === 9 ? IMG9A : IMG9} alt="Button 9" />
             </button>
-            <button onClick={() => handleButtonClick(10)}>
+            <button disabled={disable} onClick={() => handleButtonClick(10)}>
               <img
                 src={selectedButton === 10 ? IMG10A : IMG10}
                 alt="Button 10"
@@ -199,7 +268,7 @@ function SelectionAr() {
           <br />
           <br />
           <div className="selectionmainchildbtn">
-            <button onClick={() => handleButtonClick(11)}>
+            <button disabled={disable} onClick={() => handleButtonClick(11)}>
               <img
                 src={selectedButton === 11 ? IMG11A : IMG11}
                 alt="Button 11"
