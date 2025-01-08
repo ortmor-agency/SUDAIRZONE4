@@ -31,27 +31,28 @@ import "../Styles/selection.scss";
 function SelectionAr() {
   const navigate = useNavigate();
   const [disable, setDisable] = useState(true);
+  const [outvideotime, setOutVideoTime] = useState(0);
+
   const APIKEY = process.env.REACT_APP_IPKEY;
   const [selectedButton, setSelectedButton] = useState(null);
+  const [isAnimating, setIsAnimating] = useState(false);
   const isTransitioning = useRef(false);
   const pendingTransition = useRef(null);
   const transitionTimeout = useRef(null);
   const abortControllerRef = useRef(null);
 
   const makeApiCall = async (endpoint) => {
-    // Cancel any ongoing API calls
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
 
-    // Create new abort controller for this call
     abortControllerRef.current = new AbortController();
 
     const Api = `${APIKEY}${endpoint}`;
     try {
       const response = await axios.post(Api, null, {
         signal: abortControllerRef.current.signal,
-        timeout: 5000, // 5 second timeout
+        timeout: 5000,
       });
       return response;
     } catch (err) {
@@ -105,31 +106,30 @@ function SelectionAr() {
   };
 
   const processVideoTransition = async (newButtonId) => {
-    // If already transitioning, queue the new transition
     if (isTransitioning.current) {
       pendingTransition.current = newButtonId;
       return;
     }
 
     isTransitioning.current = true;
+    setIsAnimating(true);
 
     try {
-      // Set a timeout to clear the transitioning state in case something goes wrong
       transitionTimeout.current = setTimeout(() => {
         cleanupTransition();
-      }, 5000); // 5 second safety timeout
+        setIsAnimating(false);
+      }, 5000);
 
-      // Play out animation for current selection if exists
       if (outFunctions[selectedButton]) {
         await outFunctions[selectedButton]();
-        // Add a small delay between out and in transitions
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        setDisable(true);
+        await new Promise((resolve) => setTimeout(resolve, outvideotime)).then(
+          setDisable(false)
+        );
       }
 
-      // Play in animation for new selection
       if (selectionFunctions[newButtonId]) {
         await selectionFunctions[newButtonId]();
-        // Wait for the transition to complete
         await new Promise((resolve) => setTimeout(resolve, 300));
       }
     } catch (error) {
@@ -138,12 +138,11 @@ function SelectionAr() {
       }
     } finally {
       cleanupTransition();
+      setIsAnimating(false);
 
-      // Handle any pending transitions
       if (pendingTransition.current !== null) {
         const nextTransition = pendingTransition.current;
         pendingTransition.current = null;
-        // Small delay before processing next transition
         setTimeout(() => {
           processVideoTransition(nextTransition);
         }, 300);
@@ -151,22 +150,26 @@ function SelectionAr() {
     }
   };
 
-  const handleButtonClick = (newButtonId) => {
-    // Prevent rapid clicking
+  const handleButtonClick = (newButtonId, time) => {
     if (isTransitioning.current) {
       return;
     }
 
-    // Don't process if clicking the same button
     if (selectedButton === newButtonId) {
       return;
     }
-
-    // Update UI immediately
+    setOutVideoTime(time);
     setSelectedButton(newButtonId);
-
-    // Handle video transition
     processVideoTransition(newButtonId);
+  };
+
+  const getButtonStyle = (buttonId) => {
+    if (!isAnimating) return {};
+
+    return {
+      opacity: selectedButton === buttonId ? 1 : 0.3,
+      transition: "opacity 0.3s ease-in-out",
+    };
   };
 
   useEffect(() => {
@@ -178,16 +181,13 @@ function SelectionAr() {
         await makeApiCall("/api/v1/composition/layers/1/clips/2/connect");
 
         if (mounted) {
-          // Add delay for initial transition
           await new Promise((resolve) => setTimeout(resolve, 2000));
-
           await makeApiCall("/api/v1/composition/layers/1/clips/3/connect");
           setDisable(false);
         }
       } catch (error) {
         if (mounted && !axios.isCancel(error)) {
           console.error("Error during initialization:", error);
-          // Enable buttons even if initialization fails
           setDisable(false);
         }
       }
@@ -195,7 +195,6 @@ function SelectionAr() {
 
     initializeVideos();
 
-    // Cleanup function
     return () => {
       mounted = false;
       cleanupTransition();
@@ -215,50 +214,90 @@ function SelectionAr() {
       <div className="selectionbuttonmaincontainermask">
         <div className="selectionbuttonmaincontainer">
           <div className="selectionchildsection">
-            <button disabled={disable} onClick={() => handleButtonClick(1)}>
+            <button
+              disabled={disable}
+              onClick={() => handleButtonClick(1, 8000)}
+              style={getButtonStyle(1)}
+            >
               <img src={selectedButton === 1 ? IMG1A : IMG1} alt="Button 1" />
             </button>
-            <button disabled={disable} onClick={() => handleButtonClick(2)}>
+            <button
+              disabled={disable}
+              onClick={() => handleButtonClick(2, 8000)}
+              style={getButtonStyle(2)}
+            >
               <img src={selectedButton === 2 ? IMG2A : IMG2} alt="Button 2" />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
-            <button disabled={disable} onClick={() => handleButtonClick(3)}>
+            <button
+              disabled={disable}
+              onClick={() => handleButtonClick(3, 8000)}
+              style={getButtonStyle(3)}
+            >
               <img src={selectedButton === 3 ? IMG3A : IMG3} alt="Button 3" />
             </button>
-            <button disabled={disable} onClick={() => handleButtonClick(4)}>
+            <button
+              disabled={disable}
+              onClick={() => handleButtonClick(4, 8000)}
+              style={getButtonStyle(4)}
+            >
               <img src={selectedButton === 4 ? IMG4A : IMG4} alt="Button 4" />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
-            <button disabled={disable} onClick={() => handleButtonClick(5)}>
+            <button
+              disabled={disable}
+              onClick={() => handleButtonClick(5, 8000)}
+              style={getButtonStyle(5)}
+            >
               <img src={selectedButton === 5 ? IMG5A : IMG5} alt="Button 5" />
             </button>
-            <button disabled={disable} onClick={() => handleButtonClick(6)}>
+            <button
+              disabled={disable}
+              onClick={() => handleButtonClick(6, 8000)}
+              style={getButtonStyle(6)}
+            >
               <img src={selectedButton === 6 ? IMG6A : IMG6} alt="Button 6" />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
-            <button disabled={disable} onClick={() => handleButtonClick(7)}>
+            <button
+              disabled={disable}
+              onClick={() => handleButtonClick(7, 8000)}
+              style={getButtonStyle(7)}
+            >
               <img src={selectedButton === 7 ? IMG7A : IMG7} alt="Button 7" />
             </button>
-            <button disabled={disable} onClick={() => handleButtonClick(8)}>
+            <button
+              disabled={disable}
+              onClick={() => handleButtonClick(8, 8000)}
+              style={getButtonStyle(8)}
+            >
               <img src={selectedButton === 8 ? IMG8A : IMG8} alt="Button 8" />
             </button>
           </div>
           <br />
           <br />
           <div className="selectionchildsection">
-            <button disabled={disable} onClick={() => handleButtonClick(9)}>
+            <button
+              disabled={disable}
+              onClick={() => handleButtonClick(9, 8000)}
+              style={getButtonStyle(9)}
+            >
               <img src={selectedButton === 9 ? IMG9A : IMG9} alt="Button 9" />
             </button>
-            <button disabled={disable} onClick={() => handleButtonClick(10)}>
+            <button
+              disabled={disable}
+              onClick={() => handleButtonClick(10, 8000)}
+              style={getButtonStyle(10)}
+            >
               <img
                 src={selectedButton === 10 ? IMG10A : IMG10}
                 alt="Button 10"
@@ -268,7 +307,11 @@ function SelectionAr() {
           <br />
           <br />
           <div className="selectionmainchildbtn">
-            <button disabled={disable} onClick={() => handleButtonClick(11)}>
+            <button
+              disabled={disable}
+              onClick={() => handleButtonClick(11, 8000)}
+              style={getButtonStyle(11)}
+            >
               <img
                 src={selectedButton === 11 ? IMG11A : IMG11}
                 alt="Button 11"
