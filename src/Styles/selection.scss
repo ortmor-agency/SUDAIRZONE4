@@ -117,7 +117,7 @@
       img {
         width: 100%;
         object-fit: cover;
-        animation: buttonReveal 7s ease-in-out;
+        animation: buttonReveal 1s ease-in-out;
       }
       @keyframes buttonReveal {
         from {
@@ -145,7 +145,7 @@
       z-index: 9;
 
       img {
-        animation: buttonReveal 7s ease-in-out;
+        animation: buttonReveal 1s ease-in-out;
       }
 
       @keyframes buttonReveal {
@@ -161,4 +161,3 @@
     }
   }
 }
-

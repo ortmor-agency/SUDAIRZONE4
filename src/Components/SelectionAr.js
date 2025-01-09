@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import IMG1 from "../Media/Buttons/Arabic/GSPRE_ara_i.png";
@@ -30,275 +30,218 @@ import "../Styles/selection.scss";
 
 function SelectionAr() {
   const navigate = useNavigate();
-  const [disable, setDisable] = useState(true);
-  const [outvideotime, setOutVideoTime] = useState(0);
-
   const APIKEY = process.env.REACT_APP_IPKEY;
   const [selectedButton, setSelectedButton] = useState(null);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const isTransitioning = useRef(false);
-  const pendingTransition = useRef(null);
-  const transitionTimeout = useRef(null);
-  const abortControllerRef = useRef(null);
 
-  const makeApiCall = async (endpoint) => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    abortControllerRef.current = new AbortController();
-
-    const Api = `${APIKEY}${endpoint}`;
-    try {
-      const response = await axios.post(Api, null, {
-        signal: abortControllerRef.current.signal,
-        timeout: 5000,
-      });
-      return response;
-    } catch (err) {
-      if (axios.isCancel(err)) {
-        console.log("Request cancelled:", endpoint);
-      } else {
-        console.error(`API call failed for endpoint ${endpoint}:`, err);
-      }
-      throw err;
-    }
+  const handleButtonClick = (buttonId) => {
+    setSelectedButton(buttonId);
   };
-
-  const selectionFunctions = {
-    1: () => makeApiCall("/api/v1/composition/layers/5/clips/1/connect"),
-    2: () => makeApiCall("/api/v1/composition/layers/5/clips/2/connect"),
-    3: () => makeApiCall("/api/v1/composition/layers/5/clips/3/connect"),
-    4: () => makeApiCall("/api/v1/composition/layers/5/clips/4/connect"),
-    5: () => makeApiCall("/api/v1/composition/layers/5/clips/5/connect"),
-    6: () => makeApiCall("/api/v1/composition/layers/5/clips/6/connect"),
-    7: () => makeApiCall("/api/v1/composition/layers/5/clips/7/connect"),
-    8: () => makeApiCall("/api/v1/composition/layers/5/clips/8/connect"),
-    9: () => makeApiCall("/api/v1/composition/layers/5/clips/9/connect"),
-    10: () => makeApiCall("/api/v1/composition/layers/5/clips/10/connect"),
-    11: () => makeApiCall("/api/v1/composition/layers/5/clips/11/connect"),
-  };
-
-  const outFunctions = {
-    1: () => makeApiCall("/api/v1/composition/layers/4/clips/1/connect"),
-    2: () => makeApiCall("/api/v1/composition/layers/4/clips/2/connect"),
-    3: () => makeApiCall("/api/v1/composition/layers/4/clips/3/connect"),
-    4: () => makeApiCall("/api/v1/composition/layers/4/clips/4/connect"),
-    5: () => makeApiCall("/api/v1/composition/layers/4/clips/5/connect"),
-    6: () => makeApiCall("/api/v1/composition/layers/4/clips/6/connect"),
-    7: () => makeApiCall("/api/v1/composition/layers/4/clips/7/connect"),
-    8: () => makeApiCall("/api/v1/composition/layers/4/clips/8/connect"),
-    9: () => makeApiCall("/api/v1/composition/layers/4/clips/9/connect"),
-    10: () => makeApiCall("/api/v1/composition/layers/4/clips/10/connect"),
-    11: () => makeApiCall("/api/v1/composition/layers/4/clips/11/connect"),
-  };
-
-  const cleanupTransition = () => {
-    isTransitioning.current = false;
-    if (transitionTimeout.current) {
-      clearTimeout(transitionTimeout.current);
-      transitionTimeout.current = null;
-    }
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-  };
-
-  const processVideoTransition = async (newButtonId) => {
-    if (isTransitioning.current) {
-      pendingTransition.current = newButtonId;
-      return;
-    }
-
-    isTransitioning.current = true;
-    setIsAnimating(true);
-
-    try {
-      transitionTimeout.current = setTimeout(() => {
-        cleanupTransition();
-        setIsAnimating(false);
-      }, 5000);
-
-      if (outFunctions[selectedButton]) {
-        await outFunctions[selectedButton]();
-        setDisable(true);
-        await new Promise((resolve) => setTimeout(resolve, outvideotime)).then(
-          setDisable(false)
-        );
-      }
-
-      if (selectionFunctions[newButtonId]) {
-        await selectionFunctions[newButtonId]();
-        await new Promise((resolve) => setTimeout(resolve, 300));
-      }
-    } catch (error) {
-      if (!axios.isCancel(error)) {
-        console.error("Error during video transition:", error);
-      }
-    } finally {
-      cleanupTransition();
-      setIsAnimating(false);
-
-      if (pendingTransition.current !== null) {
-        const nextTransition = pendingTransition.current;
-        pendingTransition.current = null;
-        setTimeout(() => {
-          processVideoTransition(nextTransition);
-        }, 300);
-      }
-    }
-  };
-
-  const handleButtonClick = (newButtonId, time) => {
-    if (isTransitioning.current) {
-      return;
-    }
-
-    if (selectedButton === newButtonId) {
-      return;
-    }
-    setOutVideoTime(time);
-    setSelectedButton(newButtonId);
-    processVideoTransition(newButtonId);
-  };
-
-  const getButtonStyle = (buttonId) => {
-    if (!isAnimating) return {};
-
-    return {
-      opacity: selectedButton === buttonId ? 1 : 0.3,
-      transition: "opacity 0.3s ease-in-out",
-    };
-  };
-
-  useEffect(() => {
-    let mounted = true;
-
-    const initializeVideos = async () => {
-      try {
-        setDisable(true);
-        await makeApiCall("/api/v1/composition/layers/1/clips/2/connect");
-
-        if (mounted) {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-          await makeApiCall("/api/v1/composition/layers/1/clips/3/connect");
-          setDisable(false);
-        }
-      } catch (error) {
-        if (mounted && !axios.isCancel(error)) {
-          console.error("Error during initialization:", error);
-          setDisable(false);
-        }
-      }
-    };
-
-    initializeVideos();
-
-    return () => {
-      mounted = false;
-      cleanupTransition();
-    };
-  }, []);
 
   const handleOnHomeNav = () => {
     navigate("/");
   };
 
+  const Selectionone = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/2/clips/2/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectiontwo = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/2/clips/3/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionthree = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/2/clips/4/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionfour = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/2/clips/5/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionfive = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/2/clips/6/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionsix = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/2/clips/7/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionseven = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/2/clips/8/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectioneight = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/2/clips/9/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionnine = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/2/clips/10/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectionten = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/2/clips/11/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const Selectioneleven = async () => {
+    const Api = `${APIKEY}/api/v1/composition/layers/2/clips/12/connect`;
+    try {
+      let response = await axios.post(Api);
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="selectioncontainer">
-      <div className="selectionhead">
+      <div className="selectionheadar">
         <img src={Headbtn} alt="Header" />
       </div>
 
       <div className="selectionbuttonmaincontainermask">
         <div className="selectionbuttonmaincontainer">
           <div className="selectionchildsection">
-            <button
-              disabled={disable}
-              onClick={() => handleButtonClick(1, 8000)}
-              style={getButtonStyle(1)}
-            >
-              <img src={selectedButton === 1 ? IMG1A : IMG1} alt="Button 1" />
-            </button>
-            <button
-              disabled={disable}
-              onClick={() => handleButtonClick(2, 8000)}
-              style={getButtonStyle(2)}
-            >
-              <img src={selectedButton === 2 ? IMG2A : IMG2} alt="Button 2" />
-            </button>
-          </div>
-          <br />
-          <br />
-          <div className="selectionchildsection">
-            <button
-              disabled={disable}
-              onClick={() => handleButtonClick(3, 8000)}
-              style={getButtonStyle(3)}
-            >
-              <img src={selectedButton === 3 ? IMG3A : IMG3} alt="Button 3" />
-            </button>
-            <button
-              disabled={disable}
-              onClick={() => handleButtonClick(4, 8000)}
-              style={getButtonStyle(4)}
-            >
-              <img src={selectedButton === 4 ? IMG4A : IMG4} alt="Button 4" />
-            </button>
-          </div>
-          <br />
-          <br />
-          <div className="selectionchildsection">
-            <button
-              disabled={disable}
-              onClick={() => handleButtonClick(5, 8000)}
-              style={getButtonStyle(5)}
-            >
-              <img src={selectedButton === 5 ? IMG5A : IMG5} alt="Button 5" />
-            </button>
-            <button
-              disabled={disable}
-              onClick={() => handleButtonClick(6, 8000)}
-              style={getButtonStyle(6)}
-            >
-              <img src={selectedButton === 6 ? IMG6A : IMG6} alt="Button 6" />
-            </button>
-          </div>
-          <br />
-          <br />
-          <div className="selectionchildsection">
-            <button
-              disabled={disable}
-              onClick={() => handleButtonClick(7, 8000)}
-              style={getButtonStyle(7)}
-            >
-              <img src={selectedButton === 7 ? IMG7A : IMG7} alt="Button 7" />
-            </button>
-            <button
-              disabled={disable}
-              onClick={() => handleButtonClick(8, 8000)}
-              style={getButtonStyle(8)}
-            >
-              <img src={selectedButton === 8 ? IMG8A : IMG8} alt="Button 8" />
-            </button>
-          </div>
-          <br />
-          <br />
-          <div className="selectionchildsection">
-            <button
-              disabled={disable}
-              onClick={() => handleButtonClick(9, 8000)}
-              style={getButtonStyle(9)}
-            >
-              <img src={selectedButton === 9 ? IMG9A : IMG9} alt="Button 9" />
-            </button>
-            <button
-              disabled={disable}
-              onClick={() => handleButtonClick(10, 8000)}
-              style={getButtonStyle(10)}
-            >
+            <button onClick={() => handleButtonClick(1)}>
               <img
+                onClick={Selectionone}
+                src={selectedButton === 1 ? IMG1A : IMG1}
+                alt="Button 1"
+              />
+            </button>
+            <button onClick={() => handleButtonClick(2)}>
+              <img
+                onClick={Selectiontwo}
+                src={selectedButton === 2 ? IMG2A : IMG2}
+                alt="Button 2"
+              />
+            </button>
+          </div>
+          <br />
+          <br />
+          <div className="selectionchildsection">
+            <button onClick={() => handleButtonClick(3)}>
+              <img
+                onClick={Selectionthree}
+                src={selectedButton === 3 ? IMG3A : IMG3}
+                alt="Button 3"
+              />
+            </button>
+            <button onClick={() => handleButtonClick(4)}>
+              <img
+                onClick={Selectionfour}
+                src={selectedButton === 4 ? IMG4A : IMG4}
+                alt="Button 4"
+              />
+            </button>
+          </div>
+          <br />
+          <br />
+          <div className="selectionchildsection">
+            <button onClick={() => handleButtonClick(5)}>
+              <img
+                onClick={Selectionfive}
+                src={selectedButton === 5 ? IMG5A : IMG5}
+                alt="Button 5"
+              />
+            </button>
+            <button onClick={() => handleButtonClick(6)}>
+              <img
+                onClick={Selectionsix}
+                src={selectedButton === 6 ? IMG6A : IMG6}
+                alt="Button 6"
+              />
+            </button>
+          </div>
+          <br />
+          <br />
+          <div className="selectionchildsection">
+            <button onClick={() => handleButtonClick(7)}>
+              <img
+                onClick={Selectionseven}
+                src={selectedButton === 7 ? IMG7A : IMG7}
+                alt="Button 7"
+              />
+            </button>
+            <button onClick={() => handleButtonClick(8)}>
+              <img
+                onClick={Selectioneight}
+                src={selectedButton === 8 ? IMG8A : IMG8}
+                alt="Button 8"
+              />
+            </button>
+          </div>
+          <br />
+          <br />
+          <div className="selectionchildsection">
+            <button onClick={() => handleButtonClick(9)}>
+              <img
+                onClick={Selectionnine}
+                src={selectedButton === 9 ? IMG9A : IMG9}
+                alt="Button 9"
+              />
+            </button>
+            <button onClick={() => handleButtonClick(10)}>
+              <img
+                onClick={Selectionten}
                 src={selectedButton === 10 ? IMG10A : IMG10}
                 alt="Button 10"
               />
@@ -307,12 +250,9 @@ function SelectionAr() {
           <br />
           <br />
           <div className="selectionmainchildbtn">
-            <button
-              disabled={disable}
-              onClick={() => handleButtonClick(11, 8000)}
-              style={getButtonStyle(11)}
-            >
+            <button onClick={() => handleButtonClick(11)}>
               <img
+                onClick={Selectioneleven}
                 src={selectedButton === 11 ? IMG11A : IMG11}
                 alt="Button 11"
               />
@@ -326,7 +266,6 @@ function SelectionAr() {
           <img src={Homebtn} alt="Home" />
         </button>
       </div>
-
       <video
         id="Video"
         controls={false}
